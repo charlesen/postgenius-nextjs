@@ -3,7 +3,6 @@ import { Check } from 'lucide-react';
 import { getStripePrices, getStripeProducts } from '@/lib/payments/stripe';
 import { SubmitButton } from './submit-button';
 
-// Prices are fresh for one hour max
 export const revalidate = 3600;
 
 export default async function PricingPage() {
@@ -12,38 +11,56 @@ export default async function PricingPage() {
     getStripeProducts(),
   ]);
 
-  const basePlan = products.find((product) => product.name === 'Base');
-  const plusPlan = products.find((product) => product.name === 'Plus');
+  const getProductWithPrice = (productName: string) => {
+    const product = products.find((p) => p.name === productName);
+    const price = prices.find((p) => p.productId === product?.id);
+    return { product, price };
+  };
 
-  const basePrice = prices.find((price) => price.productId === basePlan?.id);
-  const plusPrice = prices.find((price) => price.productId === plusPlan?.id);
+  const monthly = getProductWithPrice('PostGenius Mensuel');
+  const yearly = getProductWithPrice('PostGenius Annuel');
+  const lifetime = getProductWithPrice('PostGenius Lifetime');
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
+      <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
         <PricingCard
-          name={basePlan?.name || 'Base'}
-          price={basePrice?.unitAmount || 800}
-          interval={basePrice?.interval || 'month'}
-          trialDays={basePrice?.trialPeriodDays || 7}
+          name="Mensuel"
+          price={monthly.price?.unitAmount || 900}
+          interval={monthly.price?.interval || 'mois'}
+          trialDays={monthly.price?.trialPeriodDays || 0}
           features={[
-            'Unlimited Usage',
-            'Unlimited Workspace Members',
-            'Email Support',
+            '20 générations IA / jour',
+            'Support par email',
+            'Annulable à tout moment',
           ]}
-          priceId={basePrice?.id}
+          priceId={monthly.price?.id}
         />
+
         <PricingCard
-          name={plusPlan?.name || 'Plus'}
-          price={plusPrice?.unitAmount || 1200}
-          interval={plusPrice?.interval || 'month'}
-          trialDays={plusPrice?.trialPeriodDays || 7}
+          name="Annuel"
+          price={yearly.price?.unitAmount || 9700}
+          interval="an"
+          trialDays={yearly.price?.trialPeriodDays || 0}
           features={[
-            'Everything in Base, and:',
-            'Early Access to New Features',
-            '24/7 Support + Slack Access',
+            'Accès illimité à PostGenius',
+            '2 mois offerts',
+            'Support prioritaire',
           ]}
-          priceId={plusPrice?.id}
+          priceId={yearly.price?.id}
+        />
+
+        <PricingCard
+          name="Lifetime"
+          price={lifetime.price?.unitAmount || 29700}
+          interval=""
+          trialDays={0}
+          features={[
+            'Paiement unique',
+            'Accès à vie à toutes les fonctionnalités',
+            'Mises à jour incluses',
+          ]}
+          priceId={lifetime.price?.id}
         />
       </div>
     </main>
@@ -66,16 +83,21 @@ function PricingCard({
   priceId?: string;
 }) {
   return (
-    <div className="pt-6">
-      <h2 className="text-2xl font-medium text-gray-900 mb-2">{name}</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        with {trialDays} day free trial
-      </p>
+    <div className="pt-6 border border-gray-200 rounded-lg p-6 shadow-sm">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-2">{name}</h2>
+      {trialDays > 0 && (
+        <p className="text-sm text-gray-600 mb-4">
+          {trialDays} jours d’essai gratuit
+        </p>
+      )}
       <p className="text-4xl font-medium text-gray-900 mb-6">
-        ${price / 100}{' '}
-        <span className="text-xl font-normal text-gray-600">
-          per user / {interval}
-        </span>
+        {(price / 100).toLocaleString('fr-FR', {
+          style: 'currency',
+          currency: 'EUR',
+        })}{' '}
+        {interval && (
+          <span className="text-xl font-normal text-gray-600">/ {interval}</span>
+        )}
       </p>
       <ul className="space-y-4 mb-8">
         {features.map((feature, index) => (

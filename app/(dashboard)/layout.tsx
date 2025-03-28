@@ -88,6 +88,12 @@ function Header() {
           <span className="ml-2 text-xl font-semibold text-gray-900">PostGenius</span>
         </Link>
         <div className="flex items-center space-x-4">
+          <Link
+            href="/dashboard/postgenius"
+            className="text-sm font-medium text-gray-700 hover:text-gray-900"
+          >
+            Dashboard
+          </Link>
           <Suspense fallback={<div className="h-9" />}>
             <UserMenu />
           </Suspense>
