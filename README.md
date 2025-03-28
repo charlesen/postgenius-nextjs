@@ -1,111 +1,117 @@
-# Next.js SaaS Starter
+# PostGenius
 
-This is a starter template for building a SaaS application using **Next.js** with support for authentication, Stripe integration for payments, and a dashboard for logged-in users.
+## Prompts
 
-**Demo: [https://next-saas-start.vercel.app/](https://next-saas-start.vercel.app/)**
-
-## Features
-
-- Marketing landing page (`/`) with animated Terminal element
-- Pricing page (`/pricing`) which connects to Stripe Checkout
-- Dashboard pages with CRUD operations on users/teams
-- Basic RBAC with Owner and Member roles
-- Subscription management with Stripe Customer Portal
-- Email/password authentication with JWTs stored to cookies
-- Global middleware to protect logged-in routes
-- Local middleware to protect Server Actions or validate Zod schemas
-- Activity logging system for any user events
-
-## Tech Stack
-
-- **Framework**: [Next.js](https://nextjs.org/)
-- **Database**: [Postgres](https://www.postgresql.org/)
-- **ORM**: [Drizzle](https://orm.drizzle.team/)
-- **Payments**: [Stripe](https://stripe.com/)
-- **UI Library**: [shadcn/ui](https://ui.shadcn.com/)
-
-## Getting Started
+<details>
+<summary>1. Post inspirationnel (soft personal branding)</summary>
 
 ```bash
-git clone https://github.com/nextjs/saas-starter
-cd saas-starter
-pnpm install
+Tu es un expert LinkedIn qui aide les freelances et créateurs à publier des posts inspirants.
+Génère un post court (3 à 5 lignes) sur le thème suivant : "{sujet}".
+Le post doit inclure :
+- une émotion ou une leçon personnelle
+- une tournure motivante ou engageante
+- une phrase de clôture qui invite à réfléchir
+
+Langue : Français
+Tonalité : {tonalité}
+Style : LinkedIn natif, sans hashtags
+
 ```
 
-## Running Locally
+</details>
 
-Use the included setup script to create your `.env` file:
+<details>
+<summary>2. Post storytelling perso</summary>
 
 ```bash
-pnpm db:setup
+Tu es un coach LinkedIn. Aide-moi à transformer une anecdote simple en post puissant.
+Voici mon anecdote : "{sujet}"
+Structure le post en :
+- Contexte (accroche)
+- Problème / moment clé
+- Résolution ou apprentissage
+- Appel à réflexion ou à engagement
+
+Langue : Français
+Tonalité : {tonalité}
+Style : Narratif, fluide, sans hashtags
+
 ```
 
-Then, run the database migrations and seed the database with a default user and team:
+</details>
+
+<details>
+<summary>3. Post CTA (appel à l’action clair)</summary>
 
 ```bash
-pnpm db:migrate
-pnpm db:seed
+Génère un post professionnel avec un appel à l’action clair pour inciter à : {objectif}
+Sujet du post : {sujet}
+Le post doit :
+- Attirer l’attention dès la 1ère ligne
+- Expliquer en quoi cela aide la cible
+- Finir par un CTA simple (ex: "Dispo en DM", "Contactez-moi", etc.)
+
+Langue : Français
+Tonalité : {tonalité}
+Style : Concis, orienté résultat
+
 ```
 
-This will create the following user and team:
+</details>
 
-- User: `test@test.com`
-- Password: `admin123`
-
-You can, of course, create new users as well through `/sign-up`.
-
-Finally, run the Next.js development server:
+<details>
+<summary>4. Mini thread éducatif LinkedIn</summary>
 
 ```bash
-pnpm dev
+Crée un thread LinkedIn éducatif en 5 points maximum.
+Sujet : "{sujet}"
+Chaque point doit être clair, utile et compréhensible pour les non-experts.
+Ajoute une accroche forte au début et une conclusion qui donne envie de liker/commenter.
+
+Langue : Français
+Tonalité : {tonalité}
+Style : format thread (avec "1.", "2.", ...)
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the app in action.
+</details>
 
-Optionally, you can listen for Stripe webhooks locally through their CLI to handle subscription change events:
+<details>
+<summary>5. Post statistique + opinion</summary>
 
 ```bash
-stripe listen --forward-to localhost:3000/api/stripe/webhook
+Tu es un créateur de contenu LinkedIn.
+Crée un post autour de cette statistique : "{sujet}"
+Objectif : choquer, éveiller ou faire réagir.
+Structure :
+- Stat choc
+- Explication ou mise en contexte
+- Opinion ou interprétation personnelle
+- Question engageante pour finir
+
+Langue : Français
+Tonalité : {tonalité}
+
 ```
 
-## Testing Payments
+</details>
 
-To test Stripe payments, use the following test card details:
+<details>
+<summary>6. Annonce de service (promotion légère)</summary>
 
-- Card Number: `4242 4242 4242 4242`
-- Expiration: Any future date
-- CVC: Any 3-digit number
+```bash
+Tu es un consultant qui veut annoncer une nouvelle offre de service.
+Sujet : "{sujet}"
+Le post doit :
+- Ne pas sonner comme une pub
+- Apporter de la valeur avant de vendre
+- Inclure une phrase naturelle pour proposer de discuter
 
-## Going to Production
+Langue : Français
+Tonalité : {tonalité}
 
-When you're ready to deploy your SaaS application to production, follow these steps:
+```
 
-### Set up a production Stripe webhook
-
-1. Go to the Stripe Dashboard and create a new webhook for your production environment.
-2. Set the endpoint URL to your production API route (e.g., `https://yourdomain.com/api/stripe/webhook`).
-3. Select the events you want to listen for (e.g., `checkout.session.completed`, `customer.subscription.updated`).
-
-### Deploy to Vercel
-
-1. Push your code to a GitHub repository.
-2. Connect your repository to [Vercel](https://vercel.com/) and deploy it.
-3. Follow the Vercel deployment process, which will guide you through setting up your project.
-
-### Add environment variables
-
-In your Vercel project settings (or during deployment), add all the necessary environment variables. Make sure to update the values for the production environment, including:
-
-1. `BASE_URL`: Set this to your production domain.
-2. `STRIPE_SECRET_KEY`: Use your Stripe secret key for the production environment.
-3. `STRIPE_WEBHOOK_SECRET`: Use the webhook secret from the production webhook you created in step 1.
-4. `POSTGRES_URL`: Set this to your production database URL.
-5. `AUTH_SECRET`: Set this to a random string. `openssl rand -base64 32` will generate one.
-
-## Other Templates
-
-While this template is intentionally minimal and to be used as a learning resource, there are other paid versions in the community which are more full-featured:
-
-- https://achromatic.dev
-- https://shipfa.st
-- https://makerkit.dev
+</details>
+```
