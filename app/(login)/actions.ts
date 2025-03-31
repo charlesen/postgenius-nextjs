@@ -57,9 +57,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
   }
 
   await setSession(foundUser);
-
-  await logActivity(ActivityType.SIGN_IN);
-
+  await logActivity(ActivityType.SIGN_IN, foundUser.id);
 
   redirect('/dashboard');
 });
@@ -105,15 +103,18 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   }
 
   await setSession(createdUser);
-
-  await logActivity(ActivityType.SIGN_UP);
-
+  await logActivity(ActivityType.SIGN_UP, createdUser.id);
 
   redirect('/dashboard');
 });
 
 export async function signOut() {
+  const user = await getUser();
+  if (user) {
+    await logActivity(ActivityType.SIGN_OUT, user.id);
+  }
   (await cookies()).delete('session');
+  redirect('/sign-in');
 }
 
 const updatePasswordSchema = z
@@ -154,7 +155,7 @@ export const updatePassword = validatedActionWithUser(
       .set({ passwordHash: newPasswordHash })
       .where(eq(users.id, user.id));
 
-    await logActivity(ActivityType.UPDATE_PASSWORD);
+    await logActivity(ActivityType.UPDATE_PASSWORD, user.id);
 
     return { success: 'Password updated successfully.' };
   },
@@ -182,10 +183,9 @@ export const deleteAccount = validatedActionWithUser(
       })
       .where(eq(users.id, user.id));
 
+    await logActivity(ActivityType.DELETE_ACCOUNT, user.id);
+
     (await cookies()).delete('session');
-
-    await logActivity(ActivityType.DELETE_ACCOUNT);
-
 
     redirect('/sign-in');
   },
@@ -202,6 +202,7 @@ export const updateAccount = validatedActionWithUser(
     const { name, email } = data;
 
     await db.update(users).set({ name, email }).where(eq(users.id, user.id));
+    await logActivity(ActivityType.UPDATE_ACCOUNT, user.id);
 
     return { success: 'Account updated successfully.' };
   },
