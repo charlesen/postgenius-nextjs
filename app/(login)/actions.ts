@@ -4,10 +4,13 @@ import { z } from 'zod';
 import { eq, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
 import {
+  ActivityType,
   User,
   users,
   type NewUser,
 } from '@/lib/db/schema';
+
+import { logActivity } from '@/lib/db/log-activity';
 import { comparePasswords, hashPassword, setSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
@@ -55,6 +58,9 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 
   await setSession(foundUser);
 
+  await logActivity(ActivityType.SIGN_IN);
+
+
   redirect('/dashboard');
 });
 
@@ -99,6 +105,9 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   }
 
   await setSession(createdUser);
+
+  await logActivity(ActivityType.SIGN_UP);
+
 
   redirect('/dashboard');
 });
@@ -145,6 +154,8 @@ export const updatePassword = validatedActionWithUser(
       .set({ passwordHash: newPasswordHash })
       .where(eq(users.id, user.id));
 
+    await logActivity(ActivityType.UPDATE_PASSWORD);
+
     return { success: 'Password updated successfully.' };
   },
 );
@@ -172,6 +183,10 @@ export const deleteAccount = validatedActionWithUser(
       .where(eq(users.id, user.id));
 
     (await cookies()).delete('session');
+
+    await logActivity(ActivityType.DELETE_ACCOUNT);
+
+
     redirect('/sign-in');
   },
 );
