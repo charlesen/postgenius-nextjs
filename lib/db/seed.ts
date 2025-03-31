@@ -1,6 +1,6 @@
 import { stripe } from '../payments/stripe';
 import { db } from './drizzle';
-import { users, teams, teamMembers } from './schema';
+import { users } from './schema';
 import { hashPassword } from '@/lib/auth/session';
 
 async function createStripeProducts() {
@@ -80,39 +80,6 @@ async function seed() {
   } else {
     user = existingUser;
     console.log('ℹ️ Utilisateur déjà existant, réutilisé.');
-  }
-
-  let team;
-
-  const existingTeam = await db.query.teams.findFirst({
-    where: (t, { eq }) => eq(t.name, 'Test Team'),
-  });
-
-  if (!existingTeam) {
-    [team] = await db
-      .insert(teams)
-      .values({ name: 'Test Team' })
-      .returning();
-    console.log('✅ Équipe créée.');
-  } else {
-    team = existingTeam;
-    console.log('ℹ️ Équipe déjà existante, réutilisée.');
-  }
-
-  const existingMember = await db.query.teamMembers.findFirst({
-    where: (tm, { eq, and }) =>
-      and(eq(tm.teamId, team.id), eq(tm.userId, user.id)),
-  });
-
-  if (!existingMember) {
-    await db.insert(teamMembers).values({
-      teamId: team.id,
-      userId: user.id,
-      role: 'owner',
-    });
-    console.log('✅ Lien user/team créé.');
-  } else {
-    console.log('ℹ️ Lien user/team déjà existant.');
   }
 
   await createStripeProducts();
