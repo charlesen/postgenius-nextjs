@@ -6,11 +6,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 export default function LinkedInPost() {
     const [topic, setTopic] = useState('');
+
     const [tone, setTone] = useState('Professional');
+    const [customTone, setCustomTone] = useState('');
+
+
     const [audience, setAudience] = useState('General');
+    const [customAudience, setCustomAudience] = useState('');
+
     const [keywords, setKeywords] = useState('');
     const [post, setPost] = useState('');
     const [loading, setLoading] = useState(false);
@@ -46,16 +59,68 @@ export default function LinkedInPost() {
                         onChange={(e) => setTopic(e.target.value)}
                         placeholder="Topic (e.g., AI in marketing)"
                     />
-                    <Input
-                        value={tone}
-                        onChange={(e) => setTone(e.target.value)}
-                        placeholder="Tone (e.g., Professional, Casual)"
-                    />
-                    <Input
-                        value={audience}
-                        onChange={(e) => setAudience(e.target.value)}
-                        placeholder="Audience (e.g., General, Developers)"
-                    />
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Tone</label>
+                        <Select
+                            value={tone}
+                            onValueChange={(value) => {
+                                setTone(value);
+                                if (value !== 'other') setCustomTone('');
+                            }}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select a tone" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Professional">Professional</SelectItem>
+                                <SelectItem value="Casual">Casual</SelectItem>
+                                <SelectItem value="Inspirational">Inspirational</SelectItem>
+                                <SelectItem value="Humorous">Humorous</SelectItem>
+                                <SelectItem value="Educational">Educational</SelectItem>
+                                <SelectItem value="other">Other...</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        {tone === 'other' && (
+                            <Input
+                                placeholder="Enter a custom tone"
+                                value={customTone}
+                                onChange={(e) => setCustomTone(e.target.value)}
+                            />
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Audience</label>
+                        <Select
+                            value={audience}
+                            onValueChange={(value) => {
+                                setAudience(value);
+                                if (value !== 'other') setCustomAudience('');
+                            }}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select an audience" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="General">General</SelectItem>
+                                <SelectItem value="Developers">Developers</SelectItem>
+                                <SelectItem value="Entrepreneurs">Entrepreneurs</SelectItem>
+                                <SelectItem value="Marketers">Marketers</SelectItem>
+                                <SelectItem value="Job Seekers">Job Seekers</SelectItem>
+                                <SelectItem value="other">Other...</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        {audience === 'other' && (
+                            <Input
+                                placeholder="Enter a custom audience"
+                                value={customAudience}
+                                onChange={(e) => setCustomAudience(e.target.value)}
+                            />
+                        )}
+                    </div>
+
                     <Input
                         value={keywords}
                         onChange={(e) => setKeywords(e.target.value)}
