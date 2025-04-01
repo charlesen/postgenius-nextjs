@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input';
 import { customerPortalAction } from '@/lib/payments/actions';
 import { User } from '@/lib/db/schema';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { updateAccount, updatePassword, deleteAccount } from '@/app/(login)/actions';
 
 export function Settings({ user }: { user: User }) {

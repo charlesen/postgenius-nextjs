@@ -2,12 +2,25 @@ import { redirect } from 'next/navigation';
 import { Settings } from './settings';
 import { getUser } from '@/lib/db/queries';
 
-export default async function SettingsPage() {
+export default async function DashboardPage() {
   const user = await getUser();
 
   if (!user) {
     redirect('/sign-in');
   }
 
-  return <Settings user={user} />;
+  // Return simple title page
+  return (
+    <section className="flex-1 p-4 lg:p-8 space-y-8">
+      <div>
+        <h2 className="text-2xl lg:text-3xl font-semibold mb-2">
+          Dashboard
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          Welcome back, {user.name}
+        </p>
+      </div>
+    </section>
+  );
+
 }

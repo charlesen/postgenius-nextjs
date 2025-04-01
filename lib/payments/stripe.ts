@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getUser } from '@/lib/db/queries';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia'
+  apiVersion: '2025-02-24.acacia',
 });
 
 export async function createCheckoutSession({ priceId }: { priceId: string }) {
@@ -18,17 +18,18 @@ export async function createCheckoutSession({ priceId }: { priceId: string }) {
     line_items: [
       {
         price: priceId,
-        quantity: 1
-      }
+        quantity: 1,
+      },
     ],
     mode: 'subscription',
     success_url: `${process.env.BASE_URL}/api/stripe/checkout?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.BASE_URL}/pricing`,
+    customer: user.stripeCustomerId || undefined,
     client_reference_id: user.id.toString(),
     allow_promotion_codes: true,
     subscription_data: {
-      trial_period_days: 14
-    }
+      trial_period_days: 14,
+    },
   });
 
   return session.url!;
@@ -37,35 +38,63 @@ export async function createCheckoutSession({ priceId }: { priceId: string }) {
 export async function createCustomerPortalSession() {
   const user = await getUser();
 
-  if (!user || !user.stripeCustomerId) {
+  if (!user || !user.stripeCustomerId || !user.stripeProductId) {
     redirect('/pricing');
   }
 
-  const configuration = await stripe.billingPortal.configurations.create({
-    business_profile: {
-      headline: 'Manage your subscription'
-    },
-    features: {
-      subscription_update: {
-        enabled: true,
-        default_allowed_updates: ['price', 'quantity', 'promotion_code'],
-        proration_behavior: 'create_prorations'
-      },
-      subscription_cancel: {
-        enabled: true,
-        mode: 'at_period_end',
-        cancellation_reason: {
-          enabled: true,
-          options: ['too_expensive', 'missing_features', 'switched_service', 'unused', 'other']
-        }
-      }
+  let configuration: Stripe.BillingPortal.Configuration;
+  const configurations = await stripe.billingPortal.configurations.list();
+
+  if (configurations.data.length > 0) {
+    configuration = configurations.data[0];
+  } else {
+    const prices = await stripe.prices.list({
+      product: user.stripeProductId,
+      active: true,
+    });
+
+    if (prices.data.length === 0) {
+      throw new Error("Aucun prix actif trouvé pour ce produit.");
     }
-  });
+
+    configuration = await stripe.billingPortal.configurations.create({
+      business_profile: {
+        headline: 'Manage your subscription',
+      },
+      features: {
+        subscription_update: {
+          enabled: true,
+          default_allowed_updates: ['price', 'quantity', 'promotion_code'],
+          proration_behavior: 'create_prorations',
+          products: [
+            {
+              product: user.stripeProductId,
+              prices: prices.data.map((price) => price.id),
+            },
+          ],
+        },
+        subscription_cancel: {
+          enabled: true,
+          mode: 'at_period_end',
+          cancellation_reason: {
+            enabled: true,
+            options: [
+              'too_expensive',
+              'missing_features',
+              'switched_service',
+              'unused',
+              'other',
+            ],
+          },
+        },
+      },
+    });
+  }
 
   return stripe.billingPortal.sessions.create({
     customer: user.stripeCustomerId,
     return_url: `${process.env.BASE_URL}/dashboard`,
-    configuration: configuration.id
+    configuration: configuration.id,
   });
 }
 
@@ -73,7 +102,7 @@ export async function getStripePrices() {
   const prices = await stripe.prices.list({
     expand: ['data.product'],
     active: true,
-    type: 'recurring'
+    type: 'recurring',
   });
 
   return prices.data.map((price) => ({
@@ -83,14 +112,14 @@ export async function getStripePrices() {
     unitAmount: price.unit_amount,
     currency: price.currency,
     interval: price.recurring?.interval,
-    trialPeriodDays: price.recurring?.trial_period_days
+    trialPeriodDays: price.recurring?.trial_period_days,
   }));
 }
 
 export async function getStripeProducts() {
   const products = await stripe.products.list({
     active: true,
-    expand: ['data.default_price']
+    expand: ['data.default_price'],
   });
 
   return products.data.map((product) => ({
@@ -100,6 +129,6 @@ export async function getStripeProducts() {
     defaultPriceId:
       typeof product.default_price === 'string'
         ? product.default_price
-        : product.default_price?.id
+        : product.default_price?.id,
   }));
 }
