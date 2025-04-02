@@ -51,6 +51,19 @@ export enum ActivityType {
   UPDATE_ACCOUNT = 'UPDATE_ACCOUNT',
 }
 
+export const linkedinPosts = pgTable('linkedin_posts', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id),
+  topic: text('topic').notNull(),
+  tone: text('tone'),
+  audience: text('audience'),
+  content: text('content').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export type LinkedInPost = typeof linkedinPosts.$inferSelect;
+export type NewLinkedInPost = typeof linkedinPosts.$inferInsert;
+
 
 
 export type User = typeof users.$inferSelect;

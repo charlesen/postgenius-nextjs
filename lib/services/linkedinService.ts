@@ -6,6 +6,8 @@ interface GeneratePostParams {
     tone?: string;
     audience?: string;
     keywords?: string[];
+    prompt_style?: string;
+    language?: string;
 }
 
 interface GeneratePostResponse {
@@ -17,6 +19,8 @@ export const generateLinkedInPost = async ({
     tone = 'Professional',
     audience = 'General',
     keywords = [],
+    prompt_style = 'inspiration',
+    language = 'English',
 }: GeneratePostParams): Promise<string> => {
     const response = await fetch(`${API_URL}/api/linkedin/generate-post`, {
         method: 'POST',
@@ -24,7 +28,14 @@ export const generateLinkedInPost = async ({
             'Content-Type': 'application/json',
             'x-master-key': MASTER_KEY,
         },
-        body: JSON.stringify({ topic, tone, audience, keywords }),
+        body: JSON.stringify({
+            topic,
+            tone,
+            audience,
+            keywords,
+            prompt_style,
+            language,
+        }),
     });
 
     if (!response.ok) {

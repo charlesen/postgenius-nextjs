@@ -16,15 +16,13 @@ import {
 
 export default function LinkedInPost() {
     const [topic, setTopic] = useState('');
-
     const [tone, setTone] = useState('Professional');
     const [customTone, setCustomTone] = useState('');
-
-
     const [audience, setAudience] = useState('General');
     const [customAudience, setCustomAudience] = useState('');
-
     const [keywords, setKeywords] = useState('');
+    const [promptStyle, setPromptStyle] = useState('inspiration');
+    const [language, setLanguage] = useState('French');
     const [post, setPost] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -35,9 +33,11 @@ export default function LinkedInPost() {
         try {
             const generatedPost = await generateLinkedInPost({
                 topic,
-                tone,
-                audience,
+                tone: customTone || tone,
+                audience: customAudience || audience,
                 keywords: keywords.split(',').map((k) => k.trim()).filter(Boolean),
+                prompt_style: promptStyle,
+                language,
             });
             setPost(generatedPost);
         } catch (err) {
@@ -59,6 +59,7 @@ export default function LinkedInPost() {
                         onChange={(e) => setTopic(e.target.value)}
                         placeholder="Topic (e.g., AI in marketing)"
                     />
+
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Tone</label>
                         <Select
@@ -80,7 +81,6 @@ export default function LinkedInPost() {
                                 <SelectItem value="other">Other...</SelectItem>
                             </SelectContent>
                         </Select>
-
                         {tone === 'other' && (
                             <Input
                                 placeholder="Enter a custom tone"
@@ -111,7 +111,6 @@ export default function LinkedInPost() {
                                 <SelectItem value="other">Other...</SelectItem>
                             </SelectContent>
                         </Select>
-
                         {audience === 'other' && (
                             <Input
                                 placeholder="Enter a custom audience"
@@ -121,11 +120,44 @@ export default function LinkedInPost() {
                         )}
                     </div>
 
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Prompt Style</label>
+                        <Select value={promptStyle} onValueChange={setPromptStyle}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select a style" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="inspiration">Inspiration</SelectItem>
+                                <SelectItem value="storytelling">Storytelling</SelectItem>
+                                <SelectItem value="cta">Appel à l’action</SelectItem>
+                                <SelectItem value="thread">Mini-thread</SelectItem>
+                                <SelectItem value="stat_opinion">Statistique + opinion</SelectItem>
+                                <SelectItem value="service_announcement">Annonce de service</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium">Language</label>
+                        <Select value={language} onValueChange={setLanguage}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select a language" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="French">French</SelectItem>
+                                <SelectItem value="English">English</SelectItem>
+                                <SelectItem value="Spanish">Spanish</SelectItem>
+                                <SelectItem value="German">German</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     <Input
                         value={keywords}
                         onChange={(e) => setKeywords(e.target.value)}
                         placeholder="Keywords (comma-separated)"
                     />
+
                     <Button onClick={handleGenerate} disabled={loading}>
                         {loading ? 'Generating...' : 'Generate Post'}
                     </Button>
