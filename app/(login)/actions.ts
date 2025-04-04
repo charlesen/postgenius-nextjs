@@ -11,10 +11,10 @@ import {
 } from '@/lib/db/schema';
 
 import { logActivity } from '@/lib/db/log-activity';
-import { comparePasswords, hashPassword, setSession } from '@/lib/auth/session';
+import { comparePasswords, hashPassword } from '@/lib/auth/session';
+import { setSession, getUser } from '@/lib/auth/session-server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { getUser } from '@/lib/db/queries';
 import {
   validatedAction,
   validatedActionWithUser,

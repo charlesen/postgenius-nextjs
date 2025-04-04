@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
-import { Settings } from './settings';
-import { getUser } from '@/lib/db/queries';
+import { getUser } from '@/lib/auth/session-server';
 
 export default async function DashboardPage() {
   const user = await getUser();

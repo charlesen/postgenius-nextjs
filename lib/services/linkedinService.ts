@@ -45,3 +45,19 @@ export const generateLinkedInPost = async ({
     const data: GeneratePostResponse = await response.json();
     return data.post;
 };
+
+
+export const fetchPostHistory = async (limit = 10): Promise<string[]> => {
+    const response = await fetch(`${API_URL}/api/linkedin/history?limit=${limit}`, {
+        headers: {
+            'x-master-key': MASTER_KEY,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch post history');
+    }
+
+    const data = await response.json();
+    return data.map((item: { post: string }) => item.post);
+};

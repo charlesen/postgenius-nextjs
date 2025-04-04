@@ -3,7 +3,7 @@
 import { desc, eq } from 'drizzle-orm';
 import { db } from './drizzle';
 import { activityLogs, ActivityType } from './schema';
-import { getUser } from './queries';
+import { getUser } from '@/lib/auth/session-server';
 
 import { ActivityLog } from '@/lib/db/schema';
 

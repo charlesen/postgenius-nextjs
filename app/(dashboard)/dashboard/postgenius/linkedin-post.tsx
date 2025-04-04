@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { generateLinkedInPost } from '@/lib/services/linkedinService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-export default function LinkedInPost() {
+interface LinkedInPostProps {
+    initialContent?: string;
+}
+
+export default function LinkedInPost({ initialContent = '' }: LinkedInPostProps) {
+    const [post, setPost] = useState(initialContent);
     const [topic, setTopic] = useState('');
     const [tone, setTone] = useState('Professional');
     const [customTone, setCustomTone] = useState('');
@@ -23,9 +28,12 @@ export default function LinkedInPost() {
     const [keywords, setKeywords] = useState('');
     const [promptStyle, setPromptStyle] = useState('inspiration');
     const [language, setLanguage] = useState('French');
-    const [post, setPost] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        setPost(initialContent);
+    }, [initialContent]);
 
     const handleGenerate = async () => {
         setLoading(true);

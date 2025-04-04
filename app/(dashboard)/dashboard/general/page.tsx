@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { Settings } from '@/app/(dashboard)/dashboard/settings';
-import { getUser } from '@/lib/db/queries';
+import { getUser } from '@/lib/auth/session-server';
 
 
 export default async function GeneralPage() {
